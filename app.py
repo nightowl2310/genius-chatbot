@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import google.generativeai as genai
+from google import genai
 import requests
 from bs4 import BeautifulSoup
 import os
@@ -8,11 +8,9 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# --- Config ---
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-COACHING_WEBSITE_URL = "https://genius-tutorial.vercel.app"  # ✅ your URL
+COACHING_WEBSITE_URL = "https://genius-tutorial.vercel.app"
 
-# --- Scrape website once on startup ---
 def scrape_website(url):
     try:
         response = requests.get(url, timeout=10)
@@ -36,11 +34,8 @@ If you don't know something, say: 'Please contact us directly for more info.'
 Keep answers short, friendly, and to the point.
 """
 
-# --- Gemini Setup ---
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
-# --- Chat Route ---
 @app.route("/chat", methods=["POST"])
 def chat():
     user_message = request.json.get("message", "")
@@ -48,9 +43,11 @@ def chat():
         return jsonify({"reply": "Please ask something."})
 
     full_prompt = SYSTEM_PROMPT + "\nStudent: " + user_message
-    response = model.generate_content(full_prompt)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=full_prompt
+    )
     return jsonify({"reply": response.text})
 
-# --- Run ---
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
