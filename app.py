@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from google import genai
 import requests
 from bs4 import BeautifulSoup
 import os
+import google.generativeai as genai
 
 app = Flask(__name__)
 CORS(app)
@@ -34,19 +34,16 @@ If you don't know something, say: 'Please contact us directly for more info.'
 Keep answers short, friendly, and to the point.
 """
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel("gemini-1.0-pro")
 
 @app.route("/chat", methods=["POST"])
 def chat():
     user_message = request.json.get("message", "")
     if not user_message:
         return jsonify({"reply": "Please ask something."})
-
     full_prompt = SYSTEM_PROMPT + "\nStudent: " + user_message
-    response = client.models.generate_content(
-    model="gemini-2.0-flash-001",
-    contents=full_prompt
-    )
+    response = model.generate_content(full_prompt)
     return jsonify({"reply": response.text})
 
 if __name__ == "__main__":
