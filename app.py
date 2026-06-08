@@ -43,7 +43,7 @@ model = genai.GenerativeModel("gemini-1.0-pro")
 def chat():
     user_message = request.json.get("message", "")
     if not user_message:
-        return jsonify({"reply": "Please ask something."})
+        return jsonify({"reply": "Backend is working"})
     full_prompt = SYSTEM_PROMPT + "\nStudent: " + user_message
     response = model.generate_content(full_prompt)
     return jsonify({"reply": response.text})
