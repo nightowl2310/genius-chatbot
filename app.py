@@ -49,7 +49,7 @@ def chat():
         return jsonify({"reply": "Please ask something."})
     full_prompt = SYSTEM_PROMPT + "\nStudent: " + user_message
     response = client.models.generate_content(
-        model="gemini-2.-flash",
+        model="gemini-2.0-flash",  # ✅ correct
         contents=full_prompt
     )
     return jsonify({"reply": response.text})
