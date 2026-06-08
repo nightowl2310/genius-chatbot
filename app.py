@@ -50,3 +50,10 @@ def chat():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
+@app.route("/models", methods=["GET"])
+def list_models():
+    models = []
+    for m in genai.list_models():
+        models.append(m.name)
+    return jsonify({"models": models})
